@@ -56,6 +56,8 @@ def initialize_outputdir(output_dir, xml_filename):
 
     include_filenames = [xml_filename]
 
+    script_dir = os.path.dirname(os.path.realpath(__file__))
+
     for include_filename in include_filenames:
         xmldoc = minidom.parse(include_filename)
         includes = xmldoc.getElementsByTagName('Include')
@@ -64,6 +66,14 @@ def initialize_outputdir(output_dir, xml_filename):
             new_filename = os.path.join(
                 os.path.dirname(include_filename),
                 include.attributes['file'].value)
+            core_filename = os.path.join(script_dir,
+                "../NeuroML2/NeuroML2CoreTypes/",
+                include.attributes['file'].value)
+            if not os.path.exists(new_filename):
+                if not os.path.exists(core_filename):
+                    raise Exception("Couldn't find file %s" % new_filename)
+                else:
+                    continue
             include_filenames.append(new_filename)
 
     # TODO this doesn't work if you have xml files in subdirectory / abs paths
@@ -73,7 +83,7 @@ def initialize_outputdir(output_dir, xml_filename):
             include_filename,
             os.path.join(
                 output_dir,
-                os.path.basename(include_filename))) 
+                os.path.basename(include_filename)))
 
 
 def main():
